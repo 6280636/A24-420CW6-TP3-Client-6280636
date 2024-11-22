@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
-import { HttpClient } from '@angular/common/http';
 
-import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -12,9 +11,15 @@ import { lastValueFrom } from 'rxjs';
 export class AppComponent {
   toggleLogout : boolean = true;
 
+  constructor(public route: Router) { }
+
   logout(){
 
     // ██ Supprimer le token juste ici ! ██
+
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("userId");
+    sessionStorage.removeItem("pseudo");
 
     let darkScreen : HTMLElement | null = document.querySelector("#darkScreen");
     if(darkScreen == null) return;
@@ -27,7 +32,7 @@ export class AppComponent {
 
     this.toggleLogout = !this.toggleLogout;
 
-    sessionStorage.removeItem("token");
+    this.route.navigate(["/login"]);
   }
 
 }
