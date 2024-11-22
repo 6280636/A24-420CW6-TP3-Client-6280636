@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Game } from './gameLogic/game';
+import { HttpClient } from '@angular/common/http';
+import { Score } from '../models/score';
+import { ScoreService } from '../services/score.service';
 
 @Component({
   selector: 'app-play',
@@ -8,10 +11,14 @@ import { Game } from './gameLogic/game';
 })
 export class PlayComponent implements OnInit {
 
+  scoreValue = sessionStorage.getItem("score")!;   
+  timeInSeconds = sessionStorage.getItem("time")!; 
+  userId = sessionStorage.getItem("userId")!;
   game : Game | null = null;
   scoreSent : boolean = false;
+  pseudo : string | null = null;
 
-  constructor(){}
+  constructor(public httpService: HttpClient, public score: ScoreService){}
 
   ngOnDestroy(): void {
     // Ceci est crotté mais ne le retirez pas sinon le jeu bug.
@@ -20,6 +27,7 @@ export class PlayComponent implements OnInit {
 
   ngOnInit() {
     this.game = new Game();
+    this.pseudo = sessionStorage.getItem('loginUsername');
   }
 
   replay(){
@@ -28,17 +36,27 @@ export class PlayComponent implements OnInit {
     this.scoreSent = false;
   }
 
-  sendScore(){
-    if(this.scoreSent) return;
+  async sendScore (): Promise<void>{
 
-    this.scoreSent = true;
-    
-    // ██ Appeler une requête pour envoyer le score du joueur ██
-    // Le score est dans sessionStorage.getItem("score")
-    // Le temps est dans sessionStorage.getItem("time")
-    // La date sera choisie par le serveur
+    if(this.scoreSent) /* return; */
+    this.scoreSent = true;    
+    let date:Date = new Date();
+    let score = new Score(
+      
+      0,
+      this.pseudo,
+      date,         
+      this.timeInSeconds,  
+      Number(this.scoreValue),      
+      false,
+      
 
-
+    );    
+    await this.score.sendScore(score);
+   
+    //console.log(x); 
+    //return x;
+  
 
   }
 
